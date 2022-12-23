@@ -16,6 +16,7 @@ import cn.kahvia.adoing.PagesActivity;
 
 import cn.kahvia.adoing.pojo.CardItem;
 import cn.kahvia.adoing.service.CounterService;
+import cn.kahvia.adoing.utils.TimeUtil;
 
 //继承时传入泛型为内部类ViewHolder，这个Holder用来保存通过view findViewById方法获得的组件，这样只需要find一次足矣
 public class ViewPagerAdaptor extends RecyclerView.Adapter<ViewPagerAdaptor.ViewHolder> {
@@ -67,7 +68,7 @@ public class ViewPagerAdaptor extends RecyclerView.Adapter<ViewPagerAdaptor.View
         int index= CounterService.pageIndex;
         if (index==position){
             PagesActivity.cardCounter= holder.counter;
-            holder.counter.setText(CounterService.counter+"");
+            holder.counter.setText(TimeUtil.formatTime(CounterService.counter));
             holder.startButton.setVisibility(View.INVISIBLE);
             holder.counter.setVisibility(View.VISIBLE);
         }
