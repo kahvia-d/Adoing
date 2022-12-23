@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">AndroidUiDesign</string>
+    <string name="welcome">WELCOME</string>
+    <string name="email">Email</string>
+    <string name="Email">Email</string>
+    <string name="Password">Password</string>
+</resources>
