@@ -7,13 +7,17 @@
     >
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/card_front"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="25dp"
+        android:layout_marginBottom="25dp"
         app:cardCornerRadius="16dp"
         app:cardElevation="8dp"
+        android:visibility="visible"
         >
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -64,6 +68,16 @@
                 android:fontFamily="cursive"
                 android:textStyle="bold"
                 />
+<!--            切换卡片正反面的按钮-->
+            <ImageButton
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/itemContent"
+                app:layout_constraintTop_toBottomOf="@id/itemImg"
+                android:layout_marginLeft="20dp"
+                android:background="@drawable/card_items_icon"
+                android:onClick="onCardFlip"/>
             <Button
                 android:id="@+id/startButton"
                 android:layout_width="60dp"
@@ -82,7 +96,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 android:layout_marginBottom="10dp"
-                android:text="03:04:05"
+                android:text="@string/startTime"
                 android:textSize="25sp"
                 android:textStyle="bold"
                 android:fontFamily="cursive"
@@ -99,6 +113,33 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_back"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="25dp"
+        android:layout_marginBottom="25dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp"
+        android:backgroundTint="@color/teal_700"
+        android:alpha="0"
+        android:visibility="invisible">
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hello,kahvia!"
+            android:layout_gravity="center"
+            android:textSize="50dp"
+            android:textColor="@color/black"
+
+            />
 
     </androidx.cardview.widget.CardView>
 

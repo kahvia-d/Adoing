@@ -3,6 +3,10 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/code/android/Adoing/app/src/main/res/drawable/floating_button_icon.xml" value="0.15" />
+        <entry key="..\:/code/android/Adoing/app/src/main/res/drawable/ic_baseline_format_list_bulleted_24.xml" value="0.1345" />
+        <entry key="..\:/code/android/Adoing/app/src/main/res/layout/activity_pages.xml" value="0.264" />
+        <entry key="..\:/code/android/Adoing/app/src/main/res/layout/viewpager_item.xml" value="0.1" />
         <entry key="..\:/code/android/AndroidUiDesign/app/src/main/res/drawable/card_button_background.xml" value="0.15" />
         <entry key="..\:/code/android/AndroidUiDesign/app/src/main/res/drawable/edit_background.xml" value="0.1475" />
         <entry key="..\:/code/android/AndroidUiDesign/app/src/main/res/drawable/login_background.xml" value="0.16799999999999998" />
