@@ -63,7 +63,7 @@
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/itemContent"
+                app:layout_constraintTop_toBottomOf="@id/itemContent"
                 android:layout_marginBottom="5dp"
                 android:fontFamily="cursive"
                 android:textStyle="bold"
@@ -127,19 +127,86 @@
         android:layout_marginBottom="25dp"
         app:cardCornerRadius="16dp"
         app:cardElevation="8dp"
-        android:backgroundTint="@color/teal_700"
         android:alpha="0"
         android:visibility="invisible">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <ImageButton
+                android:id="@+id/card_back_button"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/card_back_icon"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="5dp"
+                android:onClick="onCardFlip2"/>
+            <ImageButton
+                android:id="@+id/card_applyChange_button"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/apply_button_icon"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginEnd="5dp"
+                android:onClick="onCardFlip2"/>
 
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Hello,kahvia!"
-            android:layout_gravity="center"
-            android:textSize="50dp"
-            android:textColor="@color/black"
+            <androidx.cardview.widget.CardView
+                android:id="@+id/itemImg_back_card"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginHorizontal="10dp"
+                app:layout_constraintTop_toBottomOf="@id/card_back_button"
+                app:cardCornerRadius="7dp">
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="@id/itemImg_back"
+                        app:layout_constraintStart_toStartOf="@id/itemImg_back"
+                        app:layout_constraintEnd_toEndOf="@id/itemImg_back"
+                        app:layout_constraintBottom_toBottomOf="@id/itemImg_back"
+                        android:text="@string/itemImg_back_string"/>
+                    <ImageView
+                        android:id="@+id/itemImg_back"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:background="@drawable/edit_background"
+                        android:scaleType="centerCrop"
+                        android:onClick="selectImage"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.cardview.widget.CardView>
+<!--            标题输入框-->
+            <EditText
+                android:id="@+id/itemTitle_back"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                app:layout_constraintTop_toBottomOf="@id/itemImg_back_card"
+                android:layout_marginTop="10dp"
+                android:layout_marginHorizontal="10dp"
+                android:maxLines="1"
+                android:background="@drawable/edit_background"
+                android:gravity="center"
+                android:hint="标题"/>
+<!--            内瓤输入框-->
+            <EditText
+                android:id="@+id/itemContent_back"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                app:layout_constraintTop_toBottomOf="@id/itemTitle_back"
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/edit_background"
+                android:gravity="top"
+                android:hint="描述"
+                android:padding="5dp"/>
 
-            />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     </androidx.cardview.widget.CardView>
 

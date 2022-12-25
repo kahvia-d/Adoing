@@ -5,4 +5,5 @@
     <string name="Email">Email</string>
     <string name="Password">Password</string>
     <string name="startTime">00:00:00</string>
+    <string name="itemImg_back_string">Click here to choose a picture</string>
 </resources>

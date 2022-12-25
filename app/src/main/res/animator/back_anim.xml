@@ -14,10 +14,10 @@
         android:startOffset="500"
         android:duration="0"
         />
-    <objectAnimator
-        android:propertyName="alpha"
-        android:valueFrom="1"
-        android:valueTo="0"
-        android:duration="0"
-        />
+<!--    <objectAnimator-->
+<!--        android:propertyName="alpha"-->
+<!--        android:valueFrom="1"-->
+<!--        android:valueTo="0"-->
+<!--        android:duration="0"-->
+<!--        />-->
 </set>

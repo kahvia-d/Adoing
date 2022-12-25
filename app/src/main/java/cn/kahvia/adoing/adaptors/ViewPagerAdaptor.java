@@ -1,5 +1,6 @@
 package cn.kahvia.adoing.adaptors;
 
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,6 +36,10 @@ public class ViewPagerAdaptor extends RecyclerView.Adapter<ViewPagerAdaptor.View
         TextView content;
         TextView pageIndex;
 
+        ImageView imageBack;
+        TextView titleBack;
+        TextView contentBack;
+
         Button startButton;
         TextView counter;
         public ViewHolder(@NonNull View itemView) {
@@ -43,6 +48,11 @@ public class ViewPagerAdaptor extends RecyclerView.Adapter<ViewPagerAdaptor.View
             title=itemView.findViewById(R.id.itemTitle);
             content=itemView.findViewById(R.id.itemContent);
             pageIndex=itemView.findViewById(R.id.pageIndex);
+
+            imageBack=itemView.findViewById(R.id.itemImg_back);
+            titleBack=itemView.findViewById(R.id.itemTitle_back);
+            contentBack=itemView.findViewById(R.id.itemContent_back);
+
             startButton=itemView.findViewById(R.id.startButton);
             counter=itemView.findViewById(R.id.pastTime);
         }
@@ -60,11 +70,22 @@ public class ViewPagerAdaptor extends RecyclerView.Adapter<ViewPagerAdaptor.View
     @Override//快速赋值，实现view的迅速加载
     public void onBindViewHolder(@NonNull ViewPagerAdaptor.ViewHolder holder, int position) {
         CardItem cardItem=cardItems.get(position);
-        holder.image.setImageResource(cardItem.getImageId());
+
+        //获取card图片的Uri地址
+        Uri imagePath = Uri.parse("android.resource://cn.kahvia.adoing/" + cardItem.getImageId());
+        //使用Uri设置图片,而不是Resource id
+        holder.image.setImageURI(imagePath);
+        holder.imageBack.setImageURI(imagePath);
+        //设置tag用于为ImageView保存Uri地址，方便卡片正反面数据交换
+        holder.imageBack.setTag(imagePath.toString());
+
         holder.title.setText(cardItem.getTitle());
+        holder.titleBack.setText(cardItem.getTitle());
         holder.content.setText(cardItem.getContent());
+        holder.contentBack.setText(cardItem.getContent());
         holder.pageIndex.setText(position+"");
 
+        //应用重启的时候，恢复正在计时的任务卡片的样式，即应用重启后显示计时器。
         int index= CounterService.pageIndex;
         if (index==position){
             PagesActivity.cardCounter= holder.counter;

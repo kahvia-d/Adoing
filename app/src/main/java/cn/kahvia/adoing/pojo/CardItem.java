@@ -1,10 +1,10 @@
 package cn.kahvia.adoing.pojo;
 
 public class CardItem {
-    int imageId;
+    Integer imageId;
     String title,content;
 
-    public CardItem(int imageId, String title, String content) {
+    public CardItem(Integer imageId, String title, String content) {
         this.imageId = imageId;
         this.title = title;
         this.content = content;
