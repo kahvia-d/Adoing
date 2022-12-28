@@ -29,9 +29,11 @@ import java.util.List;
 import cn.kahvia.adoing.adaptors.ViewPagerAdaptor;
 import cn.kahvia.adoing.pojo.CardItem;
 import cn.kahvia.adoing.service.CounterService;
+import cn.kahvia.adoing.utils.MySqlHelper;
 import cn.kahvia.adoing.utils.TimeUtil;
 
 public class PagesActivity extends AppCompatActivity {
+    private MySqlHelper mySqlHelper;
     private ViewPager2 viewPager2;
     private List<CardItem> cardItems;
     public static TextView cardCounter;
@@ -49,9 +51,31 @@ public class PagesActivity extends AppCompatActivity {
 
         }
     };
+
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//        mySqlHelper=MySqlHelper.getInstance(this);
+//        mySqlHelper.openReadLink();
+//        mySqlHelper.openWriteLink();
+//
+//    }
+
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//        mySqlHelper.closeAllDBLinks();
+//    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //加载数据库
+        mySqlHelper=MySqlHelper.getInstance(this);
+        mySqlHelper.openReadLink();
+        mySqlHelper.openWriteLink();
+
 
         frontAniSet= (AnimatorSet) AnimatorInflater.loadAnimator(this,R.animator.front_anim);
         backAniSet= (AnimatorSet) AnimatorInflater.loadAnimator(this,R.animator.back_anim);
@@ -63,19 +87,23 @@ public class PagesActivity extends AppCompatActivity {
 
         viewPager2=findViewById(R.id.viewPager2);
 
-        int[] images={R.drawable.bg1,R.drawable.girlandcat};
+        Uri[] images={
+                Uri.parse("android.resource://cn.kahvia.adoing/" + R.drawable.bg1),
+                Uri.parse("android.resource://cn.kahvia.adoing/" +R.drawable.girlandcat)
+        };
         String[] titles={"Study","Game"};
         String[] contents={"I want to study from now on. No matter how I am tired, it should keep moving on.","I want to play games from now on."};
 
-        cardItems=new ArrayList<CardItem>();
-        for (int i=0;i<images.length;i++){
-            cardItems.add(new CardItem(images[i],titles[i],contents[i]));
-        }
+//        cardItems=new ArrayList<CardItem>();
+//        for (int i=0;i<images.length;i++){
+//            cardItems.add(new CardItem(images[i],titles[i],contents[i]));
+//        }
+        cardItems=mySqlHelper.readCards();
 
         viewPager2.setAdapter(new ViewPagerAdaptor(cardItems));
-        viewPager2.setClipToPadding(false);
-        viewPager2.setClipChildren(false);
-        viewPager2.setOffscreenPageLimit(2);
+//        viewPager2.setClipToPadding(false);
+//        viewPager2.setClipChildren(false);
+        viewPager2.setOffscreenPageLimit(4);
         viewPager2.setCurrentItem(CounterService.pageIndex,false);
     }
 
@@ -114,6 +142,7 @@ public class PagesActivity extends AppCompatActivity {
         }
 
     }
+
     public void onCardClickEnd(View view){
         //获取父节点，即当前卡片，在其下寻找相应的组件
         View parent= (View) view.getParent();
@@ -233,21 +262,34 @@ public class PagesActivity extends AppCompatActivity {
         EditText titleBack=cardBack.findViewById(R.id.itemTitle_back);
         TextView content=cardFront.findViewById(R.id.itemContent);
         EditText contentBack=cardBack.findViewById(R.id.itemContent_back);
+        TextView cardDbId=cardBack.findViewById(R.id.cardDbId);
+
+        CardItem card=new CardItem();
 
         //更新图片的Uri地址
-        imageFront.setImageURI(Uri.parse((String) imageBack.getTag()));
+        card.setImage(Uri.parse((String) imageBack.getTag()));
+        imageFront.setImageURI(card.getImage());
         //更新标题
-        title.setText(titleBack.getText());
+        card.setTitle(titleBack.getText().toString());
+        title.setText(card.getTitle());
         //更新卡片描述
-        content.setText(contentBack.getText());
+        card.setContent(contentBack.getText().toString());
+        content.setText(card.getContent());
+        //更新数据库
+        card.setId(Integer.parseInt(cardDbId.getText().toString()));
+        mySqlHelper.updateCard(card);
     }
 
     public void addEmptyCard(View view){
         int index=viewPager2.getCurrentItem();
-        cardItems.add(new CardItem(R.drawable.bg1,"DEMO","Hello world!"));
-        viewPager2.setAdapter(new ViewPagerAdaptor(cardItems));
-        viewPager2.setCurrentItem(index,false);
-        viewPager2.setCurrentItem(cardItems.size()-1);
+        CardItem demo=new CardItem(Uri.parse("android.resource://cn.kahvia.adoing/" + R.drawable.bg1),"DEMO","Hello world!");
+        long rowId=mySqlHelper.addNewCard(demo);
+        if (rowId!=-1){
+            cardItems=mySqlHelper.readCards();
+            viewPager2.setAdapter(new ViewPagerAdaptor(cardItems));
+            viewPager2.setCurrentItem(index,false);
+            viewPager2.setCurrentItem(cardItems.size()-1);
+        }
     }
 
     //广播接收器
@@ -281,6 +323,7 @@ public class PagesActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(myBroadcastReceiver);
+        mySqlHelper.closeAllDBLinks();
     }
 
 

@@ -39,6 +39,7 @@ public class ViewPagerAdaptor extends RecyclerView.Adapter<ViewPagerAdaptor.View
         ImageView imageBack;
         TextView titleBack;
         TextView contentBack;
+        TextView cardDbId;
 
         Button startButton;
         TextView counter;
@@ -52,6 +53,7 @@ public class ViewPagerAdaptor extends RecyclerView.Adapter<ViewPagerAdaptor.View
             imageBack=itemView.findViewById(R.id.itemImg_back);
             titleBack=itemView.findViewById(R.id.itemTitle_back);
             contentBack=itemView.findViewById(R.id.itemContent_back);
+            cardDbId=itemView.findViewById(R.id.cardDbId);
 
             startButton=itemView.findViewById(R.id.startButton);
             counter=itemView.findViewById(R.id.pastTime);
@@ -72,7 +74,7 @@ public class ViewPagerAdaptor extends RecyclerView.Adapter<ViewPagerAdaptor.View
         CardItem cardItem=cardItems.get(position);
 
         //获取card图片的Uri地址
-        Uri imagePath = Uri.parse("android.resource://cn.kahvia.adoing/" + cardItem.getImageId());
+        Uri imagePath = cardItem.getImage();
         //使用Uri设置图片,而不是Resource id
         holder.image.setImageURI(imagePath);
         holder.imageBack.setImageURI(imagePath);
@@ -84,6 +86,7 @@ public class ViewPagerAdaptor extends RecyclerView.Adapter<ViewPagerAdaptor.View
         holder.content.setText(cardItem.getContent());
         holder.contentBack.setText(cardItem.getContent());
         holder.pageIndex.setText(position+"");
+        holder.cardDbId.setText(cardItem.getId().toString());
 
         //应用重启的时候，恢复正在计时的任务卡片的样式，即应用重启后显示计时器。
         int index= CounterService.pageIndex;
