@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.kahvia.adoing.pojo.CardItem;
+import cn.kahvia.adoing.pojo.Record;
 
 public class MySqlHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME="adoing.db";
@@ -59,6 +60,7 @@ public class MySqlHelper extends SQLiteOpenHelper {
             dbWrite.close();
             dbWrite=null;
         }
+        mySqlHelper=null;
 
     }
 
@@ -69,6 +71,10 @@ public class MySqlHelper extends SQLiteOpenHelper {
         contentValues.put("title",card.getTitle());
         contentValues.put("content",card.getContent());
         return dbWrite.insert(TABLE_NAME_CARDS,null,contentValues);
+    }
+
+    public void deleteCard(CardItem card){
+        dbWrite.delete(TABLE_NAME_CARDS,"id=?",new String[]{String.valueOf(card.getId())});
     }
 
     //获取本地保存的所有卡片
@@ -96,6 +102,48 @@ public class MySqlHelper extends SQLiteOpenHelper {
         dbWrite.update(TABLE_NAME_CARDS,contentValues,"id=?",new String[]{String.valueOf(card.getId())});
     }
 
+    public void addRecord(String title,int time){
+        ContentValues contentValues=new ContentValues();
+        contentValues.put("title",title);
+        contentValues.put("time",time);
+        contentValues.put("year",DateUtil.year());
+        contentValues.put("month",DateUtil.month());
+        contentValues.put("day",DateUtil.day());
+        dbWrite.insert(TABLE_NAME_RECORDS,null,contentValues);
+    }
+
+
+    public List<Record> readRecords(){
+        List<Record> records=new ArrayList<>();
+        Cursor cursor=dbRead.query("records",null,
+                "year=? and month=? and day=?",
+                new String[]{String.valueOf(DateUtil.year()),String.valueOf(DateUtil.month()),String.valueOf(DateUtil.day())},
+                null,null,null,null);
+        while (cursor.moveToNext()){
+            Record record=new Record();
+            boolean needAdd=true;
+            record.setId(cursor.getInt(0));
+            record.setTitle(cursor.getString(1));
+            record.setTime(cursor.getInt(2));
+            record.setYear(cursor.getInt(3));
+            record.setMonth(cursor.getInt(4));
+            record.setDay(cursor.getInt(5));
+
+            for (int i = 0; i < records.size(); i++) {
+                if (record.getTitle().equals(records.get(i).getTitle())){
+                    records.get(i).addTime(record.getTime());
+                    needAdd=false;
+                    break;
+                }
+            }
+            if (needAdd)
+                records.add(record);
+
+        }
+
+        return records;
+    }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         String sqlStr="create table  if not exists "+TABLE_NAME_CARDS+"(" +
@@ -107,7 +155,10 @@ public class MySqlHelper extends SQLiteOpenHelper {
         String sqlStr2="create table  if not exists "+TABLE_NAME_RECORDS+"(" +
                 "  id INTEGER primary key AUTOINCREMENT not null ," +
                 "  title varchar(30) not null ," +
-                "  time long not null" +
+                "  time INTEGER not null," +
+                "  year INTEGER not null,"+
+                "  month INTEGER not null,"+
+                "  day INTEGER not null"+
                 ");";
         //创建两张表，一张用于存储卡片的信息，一张用于存储任务耗时
         db.execSQL(sqlStr);

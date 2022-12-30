@@ -15,6 +15,7 @@ import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Size;
 import android.view.View;
 import android.view.animation.Animation;
 import android.widget.Button;
@@ -23,19 +24,30 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.github.mikephil.charting.utils.ColorTemplate;
+
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import cn.kahvia.adoing.adaptors.ViewPagerAdaptor;
 import cn.kahvia.adoing.pojo.CardItem;
+import cn.kahvia.adoing.pojo.Record;
 import cn.kahvia.adoing.service.CounterService;
+import cn.kahvia.adoing.utils.ChartsUtil;
 import cn.kahvia.adoing.utils.MySqlHelper;
 import cn.kahvia.adoing.utils.TimeUtil;
 
 public class PagesActivity extends AppCompatActivity {
     private MySqlHelper mySqlHelper;
     private ViewPager2 viewPager2;
+    private PieChart dayChart;
     private List<CardItem> cardItems;
+    private List<Record> records;
     public static TextView cardCounter;
     public static ImageView cardBackImage;
     private AnimatorSet frontAniSet;
@@ -52,25 +64,12 @@ public class PagesActivity extends AppCompatActivity {
         }
     };
 
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-//        mySqlHelper=MySqlHelper.getInstance(this);
-//        mySqlHelper.openReadLink();
-//        mySqlHelper.openWriteLink();
-//
-//    }
-
-//    @Override
-//    protected void onStop() {
-//        super.onStop();
-//        mySqlHelper.closeAllDBLinks();
-//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+//        deleteDatabase("adoing.db");
         //加载数据库
         mySqlHelper=MySqlHelper.getInstance(this);
         mySqlHelper.openReadLink();
@@ -86,25 +85,12 @@ public class PagesActivity extends AppCompatActivity {
         registerMyBroadcastReceiver();
 
         viewPager2=findViewById(R.id.viewPager2);
-
-        Uri[] images={
-                Uri.parse("android.resource://cn.kahvia.adoing/" + R.drawable.bg1),
-                Uri.parse("android.resource://cn.kahvia.adoing/" +R.drawable.girlandcat)
-        };
-        String[] titles={"Study","Game"};
-        String[] contents={"I want to study from now on. No matter how I am tired, it should keep moving on.","I want to play games from now on."};
-
-//        cardItems=new ArrayList<CardItem>();
-//        for (int i=0;i<images.length;i++){
-//            cardItems.add(new CardItem(images[i],titles[i],contents[i]));
-//        }
         cardItems=mySqlHelper.readCards();
-
         viewPager2.setAdapter(new ViewPagerAdaptor(cardItems));
-//        viewPager2.setClipToPadding(false);
-//        viewPager2.setClipChildren(false);
         viewPager2.setOffscreenPageLimit(4);
         viewPager2.setCurrentItem(CounterService.pageIndex,false);
+
+        dayChart=findViewById(R.id.dayChart);
     }
 
 
@@ -153,6 +139,10 @@ public class PagesActivity extends AppCompatActivity {
         //显示按钮，隐藏计时
         startButton.setVisibility(View.VISIBLE);
         pastTime.setVisibility(View.INVISIBLE);
+
+        //save the counter data
+        TextView cardTitle=parent.findViewById(R.id.itemTitle);
+        mySqlHelper.addRecord(cardTitle.getText().toString(),CounterService.counter);
 
         //stop my counter service
         Intent serviceIntent=new Intent(this, CounterService.class);
@@ -292,6 +282,35 @@ public class PagesActivity extends AppCompatActivity {
         }
     }
 
+    public void deleteCard(View view){
+        View parent= (View) view.getParent().getParent().getParent();
+        TextView cardDbId=parent.findViewById(R.id.cardDbId);
+        TextView pageIndex=parent.findViewById(R.id.pageIndex);
+
+        //获得要删除的卡片的索引，查看这个卡片是否正在计时
+        int index=Integer.parseInt(pageIndex.getText().toString());
+        if (index==CounterService.pageIndex){
+            Toast.makeText(view.getContext(),"计时中的卡片无法删除",Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        CardItem card=new CardItem();
+        card.setId(Integer.parseInt(cardDbId.getText().toString()));
+        mySqlHelper.deleteCard(card);
+
+        //删除卡片后，修正计时卡片的对应索引页
+        if (index<CounterService.pageIndex){
+            CounterService.pageIndex-=1;
+        }
+
+
+        //刷新卡片列表
+        cardItems=mySqlHelper.readCards();
+        viewPager2.setAdapter(new ViewPagerAdaptor(cardItems));
+        viewPager2.setCurrentItem(CounterService.pageIndex,false);
+
+    }
+
     //广播接收器
     public void registerMyBroadcastReceiver(){
         IntentFilter intentFilter=new IntentFilter();
@@ -306,6 +325,30 @@ public class PagesActivity extends AppCompatActivity {
         intent.setType("image/*");
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         startActivityForResult(intent,666);
+    }
+
+
+    public void changeCardOrCharts(View view){
+        if (viewPager2.getVisibility()==View.VISIBLE){
+            viewPager2.setVisibility(View.INVISIBLE);
+            records=mySqlHelper.readRecords();
+
+            //获取用于展示的数据清单
+            PieData pieData=new PieData(ChartsUtil.getPieDataSet(records));
+            //设置值的字体大小
+            pieData.setValueTextSize(12f);
+            //设置数据源
+            dayChart.setData(pieData);
+            //设置动画时长
+            dayChart.animateXY(500,500);
+            //设置中间提示语
+            dayChart.setCenterText("Today(%)");
+            //设置圆饼图可见
+            dayChart.setVisibility(View.VISIBLE);
+        }else{
+            dayChart.setVisibility(View.INVISIBLE);
+            viewPager2.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
